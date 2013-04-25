@@ -10,7 +10,18 @@
 
     <script>
         var require = {
-            baseUrl: '/WebCamWave/src/js'
+            baseUrl: '/WebCamWave/src/js',
+
+            paths: {
+                modernizr: 'libs/modernizr'
+            },
+
+            shim: {
+                modernizr: {
+                    exports: 'Modernizr'
+                }
+
+            }
         };
     </script>
 

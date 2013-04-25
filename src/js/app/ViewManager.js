@@ -4,13 +4,14 @@
  */
 
 define([
+'modernizr',
 'jac/events/EventDispatcher',
 'jac/utils/ObjUtils',
 'jac/events/GlobalEventBus',
 'app/events/WCMEvent',
 'jac/utils/EventUtils',
 'app/events/VMEvent'],
-function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
+function(Modernizr, EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
     return (function(){
         /**
          * Creates a ViewManager object
@@ -33,7 +34,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	        this.stopButtonEl.disabled = true;
 
 	        //check for canvas support
-			if(!!window.HTMLCanvasElement){
+			if(Modernizr.canvas){
 				//Button Events
 				EventUtils.addDomListener(this.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
 				EventUtils.addDomListener(this.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));

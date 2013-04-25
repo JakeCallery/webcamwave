@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+    <title>Web Cam Tests</title>
+
+    <script>
+        var USE_COMPILED = false;
+    </script>
+
+    <script>
+        var require = {
+            baseUrl: '/WebCamTests/src/js'
+        };
+    </script>
+
+</head>
+<body>
+
+    <p>Web Cams! W00t!</p>
+
+    <video id='camvideo'>
+    </video>
+
+    <div>
+        <input id="stopButtonEl" type="button" value="STOP!">
+        <input id="startButtonEl" type="button" value="START!">
+    </div>
+    <div>
+        <p id=errorPEl></p>
+    </div>
+    <div>
+        <canvas id="vidHeadCanvasEl"></canvas>
+    </div>
+
+    <script type="text/javascript">
+        //Async load RequireJS
+        (function(){
+            var sel = document.createElement('script');
+            sel.type = 'text/javascript';
+            sel.async = true;
+            if(USE_COMPILED === false){
+                sel.setAttribute('data-main', 'app/main');
+                sel.src = 'js/libs/require.js';
+            }
+            else {
+                sel.src = 'js/compiled/compiled.js';
+            }
+
+            var firstTag = document.getElementsByTagName('script')[0];
+            firstTag.parentNode.insertBefore(sel,firstTag);
+        })();
+    </script>
+</body>
+</html>

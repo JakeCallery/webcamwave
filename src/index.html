@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <title>Web Cam Tests</title>
+    <meta charset='UTF-8'>
+    <title>Web Cam Wave</title>
 
     <script>
         var USE_COMPILED = false;
@@ -10,7 +10,7 @@
 
     <script>
         var require = {
-            baseUrl: '/WebCamTests/src/js'
+            baseUrl: '/WebCamWave/src/js'
         };
     </script>
 
@@ -18,6 +18,10 @@
 <body>
 
     <p>Web Cams! W00t!</p>
+
+    <canvas id="finalCanvas" width="640" height="480">
+        No Canvas Support
+    </canvas>
 
     <video id='camvideo'>
     </video>
@@ -27,7 +31,7 @@
         <input id="startButtonEl" type="button" value="START!">
     </div>
     <div>
-        <p id=errorPEl></p>
+        <p id="errorPEl">OK</p>
     </div>
     <div>
         <canvas id="vidHeadCanvasEl"></canvas>

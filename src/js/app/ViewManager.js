@@ -24,25 +24,42 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 
 	        var self = this;
 
+	        this.document = $document;
 	        this.videoEl = $document.getElementById('camvideo');
-			this.startButtonEl = $document.getElementById('startButtonEl');
+			this.finalCanvas = $document.getElementById('finalCanvas');
+	        this.startButtonEl = $document.getElementById('startButtonEl');
 	        this.stopButtonEl = $document.getElementById('stopButtonEl');
 			this.startButtonEl.disabled = true;
 	        this.stopButtonEl.disabled = true;
 
-	        //Button Events
-	        EventUtils.addDomListener(this.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
-	        EventUtils.addDomListener(this.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));
+	        //check for canvas support
+			if(!!window.HTMLCanvasElement){
+				//Button Events
+				EventUtils.addDomListener(this.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
+				EventUtils.addDomListener(this.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));
 
-	        //GEB Events
-	        this.geb = new GEB();
-			this.geb.addHandler(WCMEvent.CONNECTED, EventDispatcher.bind(self, self.handleConnected));
-			this.geb.addHandler(WCMEvent.CONNECT_FAIL, EventDispatcher.bind(self, self.handleConnectFail));
-			this.geb.addHandler(WCMEvent.STREAM_ENDED, EventDispatcher.bind(self, self.handleStreamEnded));
+				//GEB Events
+				this.geb = new GEB();
+				this.geb.addHandler(WCMEvent.CONNECTED, EventDispatcher.bind(self, self.handleConnected));
+				this.geb.addHandler(WCMEvent.CONNECT_FAIL, EventDispatcher.bind(self, self.handleConnectFail));
+				this.geb.addHandler(WCMEvent.STREAM_ENDED, EventDispatcher.bind(self, self.handleStreamEnded));
+				this.geb.addHandler(WCMEvent.NO_WEB_CAM, EventDispatcher.bind(self, self.handleNoWebCam));
+			} else {
+				this.showError('Canvas not supported by browser');
+			}
         }
         
         //Inherit / Extend
         ObjUtils.inheritPrototype(ViewManager,EventDispatcher);
+
+	    ViewManager.prototype.showError = function($errorMsg){
+		    var el = this.document.getElementById('errorPEl');
+		    el.innerHTML = $errorMsg;
+	    };
+
+	    ViewManager.prototype.handleNoWebCam = function($e){
+		    this.showError('No Web Cam Found');
+	    };
 
 	    /**
 	     * handleStartClick
@@ -70,6 +87,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	    ViewManager.prototype.handleConnected = function($e){
 			this.stopButtonEl.disabled = false;
 		    this.startButtonEl.disabled = true;
+		    this.showError('OK');
 	    };
 
 	    /**
@@ -77,9 +95,11 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	     * @param {JacEvent} $e
 	     * @private
 	     */
-	    ViewManager.prototype.handleConnectFailed = function($e){
+	    ViewManager.prototype.handleConnectFail = function($e){
 			this.stopButtonEl.disabled = true;
 			this.startButtonEl.disabled = false;
+
+		    this.showError('Please Allow Access To WebCam, press start');
 	    };
 
 	    /**
@@ -90,6 +110,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	    ViewManager.prototype.handleStreamEnded = function($e){
 		    this.stopButtonEl.disabled = true;
 		    this.startButtonEl.disabled = false;
+		    this.showError('Camera Disconnected');
 	    };
 
         //Return constructor

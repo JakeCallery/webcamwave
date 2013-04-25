@@ -7,7 +7,13 @@
     generateSourceMaps: false,
     optimize: 'uglify2',
     paths: {
-        requireLib: 'libs/require'
+        requireLib: 'libs/require',
+	    modernizr: 'libs/modernizr'
     },
+	shim: {
+		modernizr: {
+			exports: 'Modernizr'
+		}
+	},
     include: 'requireLib'
 })

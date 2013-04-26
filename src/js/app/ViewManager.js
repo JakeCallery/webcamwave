@@ -9,9 +9,8 @@ define([
 'jac/events/GlobalEventBus',
 'app/events/WCMEvent',
 'jac/utils/EventUtils',
-'app/events/VMEvent',
-'jac/polyfills/RequestAnimationFrame'],
-function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, RequestAnimationFrame){
+'app/events/VMEvent'],
+function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
     return (function(){
         /**
          * Creates a ViewManager object

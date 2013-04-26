@@ -10,8 +10,9 @@ require([
 'stats',
 'jac/events/GlobalEventBus',
 'app/ViewManager',
-'app/WebCamManager'],
-function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager){
+'app/WebCamManager',
+'jac/polyfills/RequestAnimationFrame'],
+function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager, RequestAnimationFrame){
 
 	var geb = new GlobalEventBus();
 	var vm = new ViewManager(doc, window);

@@ -13,12 +13,17 @@
             baseUrl: '/WebCamWave/src/js',
 
             paths: {
-                modernizr: 'libs/modernizr'
+                modernizr: 'libs/modernizr',
+                stats: 'libs/Stats'
             },
 
             shim: {
                 modernizr: {
                     exports: 'Modernizr'
+                },
+
+                stats: {
+                    exports: 'Stats'
                 }
 
             }
@@ -28,13 +33,14 @@
 </head>
 <body>
 
+    <div id='statsDiv' style="position:fixed;"></div>
     <p>Web Cams! W00t!</p>
 
-    <canvas id="finalCanvas" width="640" height="480">
+    <canvas id="finalCanvas" width="640px" height="480px">
         No Canvas Support
     </canvas>
 
-    <video id='camvideo'>
+    <video id='camvideo' width="640px" height="480px">
     </video>
 
     <div>

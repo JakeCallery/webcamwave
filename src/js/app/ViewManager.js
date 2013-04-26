@@ -4,37 +4,45 @@
  */
 
 define([
-'modernizr',
 'jac/events/EventDispatcher',
 'jac/utils/ObjUtils',
 'jac/events/GlobalEventBus',
 'app/events/WCMEvent',
 'jac/utils/EventUtils',
-'app/events/VMEvent'],
-function(Modernizr, EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
+'app/events/VMEvent',
+'jac/polyfills/RequestAnimationFrame'],
+function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, RequestAnimationFrame){
     return (function(){
         /**
          * Creates a ViewManager object
          * @param {Document} $document
+         * @param {Window} $window
          * @extends {EventDispatcher}
          * @constructor
          */
-        function ViewManager($document){
+        function ViewManager($document, $window){
             //super
             EventDispatcher.call(this);
 
 	        var self = this;
 
 	        this.document = $document;
+	        this.window = $window;
 	        this.videoEl = $document.getElementById('camvideo');
 			this.finalCanvas = $document.getElementById('finalCanvas');
 	        this.startButtonEl = $document.getElementById('startButtonEl');
 	        this.stopButtonEl = $document.getElementById('stopButtonEl');
-			this.startButtonEl.disabled = true;
+			this.startButtonEl.disabled = false;
 	        this.stopButtonEl.disabled = true;
+			this.stats = null;
 
 	        //check for canvas support
-			if(Modernizr.canvas){
+			if(!!window.CanvasRenderingContext2D){
+				//Set up stats
+				this.stats = new Stats();
+				this.stats.setMode(0);
+				this.document.getElementById('statsDiv').appendChild(this.stats.domElement);
+
 				//Button Events
 				EventUtils.addDomListener(this.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
 				EventUtils.addDomListener(this.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));
@@ -53,6 +61,17 @@ function(Modernizr, EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent
         //Inherit / Extend
         ObjUtils.inheritPrototype(ViewManager,EventDispatcher);
 
+	    ViewManager.prototype.start = function(){
+		    var self = this;
+		    self.update();
+	    };
+
+	    ViewManager.prototype.update = function(){
+		    var self = this;
+		    this.window.requestAnimationFrame(EventUtils.bind(self, self.update));
+		    this.stats.update();
+	    };
+
 	    ViewManager.prototype.showError = function($errorMsg){
 		    var el = this.document.getElementById('errorPEl');
 		    el.innerHTML = $errorMsg;
@@ -60,6 +79,7 @@ function(Modernizr, EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent
 
 	    ViewManager.prototype.handleNoWebCam = function($e){
 		    this.showError('No Web Cam Found');
+		    this.startButtonEl.disabled = false;
 	    };
 
 	    /**

@@ -57,7 +57,7 @@ function(EventDispatcher,ObjUtils,GEB, EventUtils, WebCam, WebCamEvent, WCMEvent
 				self.webCam.addHandler(WebCamEvent.STREAM_ENDED, EventUtils.bind(self, self.handleStreamEnded));
 				self.webCam.addHandler(WebCamEvent.CONNECT_SUCCESS, EventUtils.bind(self, self.handleConnectSuccess));
 				self.webCam.addHandler(WebCamEvent.CONNECT_FAIL, EventUtils.bind(self, self.handleConnectFail));
-				self.webCam.init(true, true);
+				self.webCam.init(true, false);
 			} else {
 				this.geb.dispatchEvent(new WCMEvent(WCMEvent.NO_WEB_CAM));
 			}

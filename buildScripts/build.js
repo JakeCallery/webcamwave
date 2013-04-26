@@ -8,11 +8,16 @@
     optimize: 'uglify2',
     paths: {
         requireLib: 'libs/require',
-	    modernizr: 'libs/modernizr'
+	    modernizr: 'libs/stats',
+	    stats: 'libs/Stats'
     },
 	shim: {
 		modernizr: {
 			exports: 'Modernizr'
+		},
+
+		stats: {
+			exports: 'Stats'
 		}
 	},
     include: 'requireLib'

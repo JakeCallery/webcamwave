@@ -29,6 +29,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	        this.window = $window;
 	        this.videoEl = $document.getElementById('camvideo');
 			this.finalCanvas = $document.getElementById('finalCanvas');
+	        this.finalCanvasContext = null;
 	        this.startButtonEl = $document.getElementById('startButtonEl');
 	        this.stopButtonEl = $document.getElementById('stopButtonEl');
 			this.startButtonEl.disabled = false;
@@ -41,6 +42,8 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 				this.stats = new Stats();
 				this.stats.setMode(0);
 				this.document.getElementById('statsDiv').appendChild(this.stats.domElement);
+
+				this.finalCanvasContext = this.finalCanvas.getContext('2d');
 
 				//Button Events
 				EventUtils.addDomListener(this.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
@@ -61,13 +64,15 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
         ObjUtils.inheritPrototype(ViewManager,EventDispatcher);
 
 	    ViewManager.prototype.start = function(){
-		    var self = this;
-		    self.update();
+	        this.update();
 	    };
 
 	    ViewManager.prototype.update = function(){
 		    var self = this;
 		    this.window.requestAnimationFrame(EventUtils.bind(self, self.update));
+
+		    this.finalCanvasContext.drawImage(this.videoEl,0,0,640,480,0,0,320,240);
+
 		    this.stats.update();
 	    };
 

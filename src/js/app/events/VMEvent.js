@@ -8,6 +8,8 @@ function(JacEvent,ObjUtils){
     return (function(){
         /**
          * Creates a VMEvent object
+         * @param {String} $type
+         * @param {Object} [$data]
          * @extends {JacEvent}
          * @constructor
          */
@@ -21,6 +23,7 @@ function(JacEvent,ObjUtils){
 
 	    /** @const */ VMEvent.REQUEST_CAM_STOP = 'vmRequestCamStopEvent';
 	    /** @const */ VMEvent.REQUEST_CAM_START = 'vmRequestCamStartEvent';
+	    /** @const */ VMEvent.FRAME_UPDATE = 'vmFrameUpdateEvent';
 
         //Return constructor
         return VMEvent;

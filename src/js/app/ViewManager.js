@@ -9,45 +9,49 @@ define([
 'jac/events/GlobalEventBus',
 'app/events/WCMEvent',
 'jac/utils/EventUtils',
-'app/events/VMEvent'],
-function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
+'app/events/VMEvent',
+'app/VMData'],
+function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
     return (function(){
         /**
          * Creates a ViewManager object
          * @param {Document} $document
          * @param {Window} $window
+         * @param {navigator} $navigator
          * @extends {EventDispatcher}
          * @constructor
          */
-        function ViewManager($document, $window){
+        function ViewManager($document, $window, $navigator){
             //super
             EventDispatcher.call(this);
 
 	        var self = this;
+			this.vmd = new VMData();
 
-	        this.document = $document;
-	        this.window = $window;
-	        this.videoEl = $document.getElementById('camvideo');
-			this.finalCanvas = $document.getElementById('finalCanvas');
-	        this.finalCanvasContext = null;
-	        this.startButtonEl = $document.getElementById('startButtonEl');
-	        this.stopButtonEl = $document.getElementById('stopButtonEl');
-			this.startButtonEl.disabled = false;
-	        this.stopButtonEl.disabled = true;
-			this.stats = null;
+	        this.vmd.document = $document;
+	        this.vmd.window = $window;
+	        this.vmd.navigator = $navigator;
+	        this.vmd.videoEl = $document.getElementById('camvideo');
+	        this.vmd.finalCanvas = $document.getElementById('finalCanvas');
+	        this.vmd.finalCanvasContext = null;
+	        this.vmd.startButtonEl = $document.getElementById('startButtonEl');
+	        this.vmd.stopButtonEl = $document.getElementById('stopButtonEl');
+	        this.vmd.startButtonEl.disabled = false;
+	        this.vmd.stopButtonEl.disabled = true;
+	        this.vmd.stats = null;
 
 	        //check for canvas support
 			if(!!window.CanvasRenderingContext2D){
 				//Set up stats
-				this.stats = new Stats();
-				this.stats.setMode(0);
-				this.document.getElementById('statsDiv').appendChild(this.stats.domElement);
+				this.vmd.stats = new Stats();
+				this.vmd.stats.setMode(0);
+				this.vmd.document.getElementById('statsDiv').appendChild(this.vmd.stats.domElement);
 
-				this.finalCanvasContext = this.finalCanvas.getContext('2d');
+				this.vmd.finalCanvasContext = this.vmd.finalCanvas.getContext('2d');
 
 				//Button Events
-				EventUtils.addDomListener(this.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
-				EventUtils.addDomListener(this.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));
+				EventUtils.addDomListener(this.vmd.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
+				EventUtils.addDomListener(this.vmd.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));
 
 				//GEB Events
 				this.geb = new GEB();
@@ -69,21 +73,21 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 
 	    ViewManager.prototype.update = function(){
 		    var self = this;
-		    this.window.requestAnimationFrame(EventUtils.bind(self, self.update));
+		    this.vmd.window.requestAnimationFrame(EventUtils.bind(self, self.update));
 
-		    this.finalCanvasContext.drawImage(this.videoEl,0,0,640,480,0,0,320,240);
+			this.geb.dispatchEvent(new VMEvent(VMEvent.FRAME_UPDATE));
 
-		    this.stats.update();
+		    this.vmd.stats.update();
 	    };
 
 	    ViewManager.prototype.showError = function($errorMsg){
-		    var el = this.document.getElementById('errorPEl');
+		    var el = this.vmd.document.getElementById('errorPEl');
 		    el.innerHTML = $errorMsg;
 	    };
 
 	    ViewManager.prototype.handleNoWebCam = function($e){
 		    this.showError('No Web Cam Found');
-		    this.startButtonEl.disabled = false;
+		    this.vmd.startButtonEl.disabled = false;
 	    };
 
 	    /**
@@ -110,8 +114,8 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	     * @private
 	     */
 	    ViewManager.prototype.handleConnected = function($e){
-			this.stopButtonEl.disabled = false;
-		    this.startButtonEl.disabled = true;
+			this.vmd.stopButtonEl.disabled = false;
+		    this.vmd.startButtonEl.disabled = true;
 		    this.showError('OK');
 	    };
 
@@ -121,8 +125,8 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	     * @private
 	     */
 	    ViewManager.prototype.handleConnectFail = function($e){
-			this.stopButtonEl.disabled = true;
-			this.startButtonEl.disabled = false;
+			this.vmd.stopButtonEl.disabled = true;
+			this.vmd.startButtonEl.disabled = false;
 
 		    this.showError('Please Allow Access To WebCam, press start');
 	    };
@@ -133,8 +137,8 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent){
 	     * @private
 	     */
 	    ViewManager.prototype.handleStreamEnded = function($e){
-		    this.stopButtonEl.disabled = true;
-		    this.startButtonEl.disabled = false;
+		    this.vmd.stopButtonEl.disabled = true;
+		    this.vmd.startButtonEl.disabled = false;
 		    this.showError('Camera Disconnected');
 	    };
 

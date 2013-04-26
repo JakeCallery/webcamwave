@@ -11,30 +11,25 @@ define([
 'jac/webCam/WebCam',
 'jac/webCam/events/WebCamEvent',
 'app/events/WCMEvent',
-'app/events/VMEvent'],
-function(EventDispatcher,ObjUtils,GEB, EventUtils, WebCam, WebCamEvent, WCMEvent, VMEvent){
+'app/events/VMEvent',
+'app/VMData'],
+function(EventDispatcher,ObjUtils,GEB, EventUtils, WebCam, WebCamEvent, WCMEvent, VMEvent, VMData){
     return (function(){
         /**
          * Creates a WebCamManager object
-         * @param {Document} $doc
-         * @param {navigator} $navigator
-         * @param {window} $window
-         * @param {video} $videoEl
+         * @param {VMData} $vmd
          * @extends {EventDispatcher}
          * @constructor
          */
-        function WebCamManager($doc, $navigator, $window, $videoEl){
+        function WebCamManager($vmd){
             //super
             EventDispatcher.call(this);
 
-	        var self= this;
+	        var self = this;
+			this.vmd = $vmd;
 
-	        this.document = $doc;
-	        this.navigator = $navigator;
-	        this.window = $window;
 	        this.webCam = null;
 	        this.geb = new GEB();
-	        this.videoEl = $videoEl;
 
 	        //GEB
 	        this.geb = new GEB();
@@ -52,8 +47,8 @@ function(EventDispatcher,ObjUtils,GEB, EventUtils, WebCam, WebCamEvent, WCMEvent
 	    WebCamManager.prototype.init = function(){
 		    var self = this;
 
-			if(WebCam.checkSupport(self.navigator, self.window) === true){
-				self.webCam = new WebCam(self.document, self.navigator, self.window, self.videoEl);
+			if(WebCam.checkSupport(self.vmd.navigator, self.vmd.window) === true){
+				self.webCam = new WebCam(self.vmd.document, self.vmd.navigator, self.vmd.window, self.vmd.videoEl);
 				self.webCam.addHandler(WebCamEvent.STREAM_ENDED, EventUtils.bind(self, self.handleStreamEnded));
 				self.webCam.addHandler(WebCamEvent.CONNECT_SUCCESS, EventUtils.bind(self, self.handleConnectSuccess));
 				self.webCam.addHandler(WebCamEvent.CONNECT_FAIL, EventUtils.bind(self, self.handleConnectFail));

@@ -46,7 +46,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData){
 
 	    VideoGrid.prototype.handleFrameUpdate = function($e){
 		    this.stampContext.drawImage(this.vmd.videoEl, 0, 0, 640, 480, 0, 0, this.stampWidth, this.stampHeight);
-			//this.frameData = this.stampContext.getImageData(0,0,640,480);
+			this.frameData = this.stampContext.getImageData(0,0,320,240);
 
 			//make stamps
 		    for(var r = 0; r < this.numRows; r++)

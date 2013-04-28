@@ -39,6 +39,8 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 	        this.vmd.startButtonEl.disabled = false;
 	        this.vmd.stopButtonEl.disabled = true;
 	        this.vmd.stats = null;
+			this.updateDelegate = EventUtils.bind(self, self.update);
+	        this.frameUpdateEvent = new VMEvent(VMEvent.FRAME_UPDATE);
 
 	        //check for canvas support
 			if(!!window.CanvasRenderingContext2D){
@@ -73,9 +75,9 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 
 	    ViewManager.prototype.update = function(){
 		    var self = this;
-		    this.vmd.window.requestAnimationFrame(EventUtils.bind(self, self.update));
+		    this.vmd.window.requestAnimationFrame(self.updateDelegate);
 
-			this.geb.dispatchEvent(new VMEvent(VMEvent.FRAME_UPDATE));
+			this.geb.dispatchEvent(this.frameUpdateEvent);
 
 		    this.vmd.stats.update();
 	    };

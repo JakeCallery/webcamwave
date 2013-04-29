@@ -66,8 +66,8 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.circleCanvas.width = this.numCols;
 	        this.circleCanvas.height = this.numRows;
 	        this.circleCanvasCtx = this.circleCanvas.getContext('2d');
-	        var centerX = Math.round(this.circleCanvas.width/2);
-	        var centerY = Math.round(this.circleCanvas.height/2);
+	        var centerX = Math.floor(this.numCols/2);
+	        var centerY = Math.floor(this.numRows/2);
 
 	        var blue = 0;
 	        var green = 0;
@@ -77,7 +77,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.circleCanvasCtx.fillRect(0,0,this.numCols, this.numRows);
 
 	        for(var i = circleDiam; i >= 0; i--){
-		        blue = i * this.delayPerRing;
+		        blue = i;
 		        var color = '#' + MathUtils.rgbToHex(red, green, blue);
 		        this.circleCanvasCtx.beginPath();
 		        this.circleCanvasCtx.arc(centerX, centerY, i/2, 0, 2*Math.PI,false);
@@ -87,7 +87,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 
 	        //Force 0 delay in center
 	        this.circleCanvasCtx.fillStyle = '#000000';
-	        this.circleCanvasCtx.fillRect(centerX, centerY,1,1);
+	        this.circleCanvasCtx.fillRect(centerX-1, centerY-1,2,2);
 
 	        this.circleData = this.circleCanvasCtx.getImageData(0,0,this.circleCanvas.width, this.circleCanvas.height);
 
@@ -133,15 +133,16 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    }
 
 			//make stamps
-		    if(this.pastFrames.length >= this.neededFrames){
-			    var data = this.circleData.data;
-			    for(var r = 0; r < this.numRows; r++){
-				    for(var c = 0; c < this.numCols; c++){
-					    var idx = (r * this.circleData.width * 4) + (c * 4);
-					    var blueColor = data[idx+2];
-					    var frameIndexFromColor = parseInt(blueColor);
+		    var data = this.circleData.data;
+		    for(var r = 0; r < this.numRows; r++){
+			    for(var c = 0; c < this.numCols; c++){
+				    var idx = (r * this.circleData.width * 4) + (c * 4);
+				    var blueColor = data[idx+2];
+				    var frameIndexFromColor = parseInt(blueColor) * this.delayPerRing;
+				    if((this.pastFrames.length - frameIndexFromColor - 1) >= 0){
 					    this.finalContext.putImageData(this.pastFrames[this.pastFrames.length - frameIndexFromColor - 1], c*this.stampWidth, r*this.stampHeight);
 				    }
+
 			    }
 		    }
 	    };

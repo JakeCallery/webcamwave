@@ -73,8 +73,18 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        var green = 0;
 	        var red = 0;
 
+	        /*
+	        for(var i = this.circleCanvas.height; i >= 0; i--){
+		        blue = i*this.delayPerRing;
+		        var color = '#' + MathUtils.rgbToHex(red, green, blue);
+		        this.circleCanvasCtx.fillStyle = color;
+		        this.circleCanvasCtx.fillRect(0,i,this.circleCanvas.width, 1);
+		        //this.circleCanvasCtx.fill();
+	        }
+			*/
+	        
 	        for(var i = circleDiam; i >= 0; i--){
-		        blue = i;
+		        blue = i * this.delayPerRing;
 		        var color = '#' + MathUtils.rgbToHex(red, green, blue);
 		        this.circleCanvasCtx.beginPath();
 		        this.circleCanvasCtx.arc(centerX, centerY, Math.round(i/2), 0, 2*Math.PI,false);
@@ -130,10 +140,11 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			    var data = this.circleData.data;
 			    for(var r = 0; r < this.numRows; r++){
 				    for(var c = 0; c < this.numCols; c++){
-					    var idx = (r * this.numCols + c) * 4;
+					    var idx = (r * this.circleData.width * 4) + (c * 4);
 					    var blueColor = data[idx+2];
 					    var frameIndexFromColor = parseInt(blueColor);
-					    this.finalContext.putImageData(this.pastFrames[frameIndexFromColor * this.delayPerRing], c*this.stampWidth, r*this.stampHeight);
+					    this.finalContext.putImageData(this.pastFrames[frameIndexFromColor], c*this.stampWidth, r*this.stampHeight);
+					    //this.finalContext.putImageData(this.pastFrames[frameIndexFromColor * this.delayPerRing], c*this.stampWidth, r*this.stampHeight);
 				    }
 			    }
 		    }

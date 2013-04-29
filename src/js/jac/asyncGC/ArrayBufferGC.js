@@ -23,15 +23,21 @@ function(){
 			        'notsupported'
 		        );
 
+	        var blob = null;
+	        try {
+		        blob = new Blob([''], {type:'application/javascript'})
+	        } catch(err){
+		        throw 'Blob not supported';
+	        }
+
 	        if(windowURL === 'notsupported'){
 		        throw 'window.URL not supported';
-		        return;
 	        } else {
 		        //Set first instance
 		        ArrayBufferGC.prototype._singletonInstance = this;
 
 		        //Set up basic worker
-		        var workerURL = windowURL.createObjectURL(new Blob([''], {type:'application/javascript'}));
+		        var workerURL = windowURL.createObjectURL(blob);
 		        var worker = new Worker(workerURL);
 		        var workerData = [];
 

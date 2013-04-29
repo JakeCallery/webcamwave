@@ -17,7 +17,7 @@ function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager, RequestAnimatio
 	var geb = new GlobalEventBus();
 	var vm = new ViewManager(doc, window, navigator);
 	var wcm = new WebCamManager(vm.vmd);
-	var videoGrid = new VideoGrid(vm.vmd, 11);
+	var videoGrid = new VideoGrid(vm.vmd, 5, 30);
 	wcm.init();
 	vm.start();
 });

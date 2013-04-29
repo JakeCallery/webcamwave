@@ -18,16 +18,18 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
          * Creates a VideoGrid object
          * @param {VMData} $vmd
          * @param {int} $numCols
+         * @param {int} $delayPerRing
          * @extends {EventDispatcher}
          * @constructor
          */
-        function VideoGrid($vmd, $numCols){
+        function VideoGrid($vmd, $numCols, $delayPerRing){
             //super
             EventDispatcher.call(this);
 
 	        this.arrayBufferGC = new ArrayBufferGC();
 	        this.numCols = $numCols;
 	        this.vmd = $vmd;
+	        this.delayPerRing = $delayPerRing;
 	        this.geb = new GEB();
 	        this.ad = new AppData();
 	        this.finalCanvas = this.vmd.finalCanvas;
@@ -36,6 +38,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.stampCanvas = this.vmd.document.createElement('canvas');
 			this.stampContext = this.stampCanvas.getContext('2d');
 	        this.frameData = null;
+	        this.pastFrames = [];
 
 	        this.finalW = this.finalCanvas.width;
 	        this.finalH = this.finalCanvas.height;
@@ -59,6 +62,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        var el = this.vmd.document.getElementById('circleDebugDiv');
 	        el.appendChild(this.circleCanvas);
 	        var circleDiam = Math.floor(this.numCols * 1.5);
+	        this.neededFrames = circleDiam * this.delayPerRing;
 	        this.circleCanvas.setAttribute('width', Math.floor(this.numCols * 1.5).toString());
 	        this.circleCanvas.setAttribute('height', Math.floor(this.numRows * 1.5).toString());
 	        this.circleCanvasCtx = this.circleCanvas.getContext('2d');
@@ -78,6 +82,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		        this.circleCanvasCtx.fill();
 			}
 
+	        this.circleData = this.circleCanvasCtx.getImageData(0,0,this.circleCanvas.width, this.circleCanvas.height);
 
 	        var self = this;
 	        this.geb.addHandler(VMEvent.FRAME_UPDATE, EventDispatcher.bind(self, self.handleFrameUpdate));
@@ -110,22 +115,28 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    }
 
 			//Not needed yet for this experiment, will need for future experiments
-			//this.frameData = this.stampContext.getImageData(0,0,this.stampWidth,this.stampHeight);
+			this.pastFrames.push(this.stampContext.getImageData(0,0,this.stampWidth,this.stampHeight));
+
+		    if(this.pastFrames.length > this.neededFrames){
+			    var oldFrame = this.pastFrames.shift();
+			    if(!this.ad.isFireFox){
+				    this.arrayBufferGC.dispose(oldFrame);
+			    }
+			    oldFrame = null;
+		    }
 
 			//make stamps
-		    for(var r = 0; r < this.numRows; r++){
-			    for(var c = 0; c < this.numCols; c++){
-				    this.finalContext.drawImage(this.stampCanvas, 0, 0, this.stampWidth, this.stampHeight,
-					    (c * this.stampWidth),(r * this.stampHeight), this.stampWidth, this.stampHeight);
+		    if(this.pastFrames.length >= this.neededFrames){
+			    var data = this.circleData.data;
+			    for(var r = 0; r < this.numRows; r++){
+				    for(var c = 0; c < this.numCols; c++){
+					    var idx = (r * this.numCols + c) * 4;
+					    var blueColor = data[idx+2];
+					    var frameIndexFromColor = parseInt(blueColor);
+					    this.finalContext.putImageData(this.pastFrames[frameIndexFromColor * this.delayPerRing], c*this.stampWidth, r*this.stampHeight);
+				    }
 			    }
 		    }
-
-		    //Hack to get around FF crashing when using Webworker ArrayBuffer dispose
-		    /*
-		    if(!this.ad.isFireFox){
-			    this.arrayBufferGC.dispose(this.frameData.data.buffer);
-		    }
-		    */
 	    };
 
 	    VideoGrid.prototype.handleWebCamConnect = function($e){

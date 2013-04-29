@@ -10,8 +10,9 @@ define(['jac/events/EventDispatcher',
 'app/VMData',
 'jac/asyncGC/ArrayBufferGC',
 'app/AppData',
-'app/events/WCMEvent'],
-function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent){
+'app/events/WCMEvent',
+'jac/utils/MathUtils'],
+function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent, MathUtils){
     return (function(){
         /**
          * Creates a VideoGrid object
@@ -52,6 +53,31 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			this.numRows = Math.floor(this.finalH / cellHeight);
 	        this.stampWidth = cellWidth;
 	        this.stampHeight = cellHeight;
+
+	        //Set up circle gradient
+	        this.circleCanvas = this.vmd.document.createElement('canvas');
+	        var el = this.vmd.document.getElementById('circleDebugDiv');
+	        el.appendChild(this.circleCanvas);
+	        var circleDiam = Math.floor(this.numCols * 1.5);
+	        this.circleCanvas.setAttribute('width', Math.floor(this.numCols * 1.5).toString());
+	        this.circleCanvas.setAttribute('height', Math.floor(this.numRows * 1.5).toString());
+	        this.circleCanvasCtx = this.circleCanvas.getContext('2d');
+	        var centerX = Math.round(this.circleCanvas.width/2);
+	        var centerY = Math.round(this.circleCanvas.height/2);
+
+	        var blue = 0;
+	        var green = 0;
+	        var red = 0;
+
+	        for(var i = circleDiam; i >= 0; i--){
+		        blue = i;
+		        var color = '#' + MathUtils.rgbToHex(red, green, blue);
+		        this.circleCanvasCtx.beginPath();
+		        this.circleCanvasCtx.arc(centerX, centerY, Math.round(i/2), 0, 2*Math.PI,false);
+		        this.circleCanvasCtx.fillStyle = color;
+		        this.circleCanvasCtx.fill();
+			}
+
 
 	        var self = this;
 	        this.geb.addHandler(VMEvent.FRAME_UPDATE, EventDispatcher.bind(self, self.handleFrameUpdate));

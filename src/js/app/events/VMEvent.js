@@ -24,6 +24,7 @@ function(JacEvent,ObjUtils){
 	    /** @const */ VMEvent.REQUEST_CAM_STOP = 'vmRequestCamStopEvent';
 	    /** @const */ VMEvent.REQUEST_CAM_START = 'vmRequestCamStartEvent';
 	    /** @const */ VMEvent.FRAME_UPDATE = 'vmFrameUpdateEvent';
+	    /** @const */ VMEvent.GRID_CLICKED = 'vmGridClickedEvent';
 
         //Return constructor
         return VMEvent;

@@ -56,56 +56,67 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			this.numRows = Math.floor(this.finalH / cellHeight);
 	        this.stampWidth = cellWidth;
 	        this.stampHeight = cellHeight;
-
-	        //Set up circle gradient
-	        this.circleCanvas = this.vmd.document.createElement('canvas');
-	        var el = this.vmd.document.getElementById('circleDebugDiv');
-	        el.appendChild(this.circleCanvas);
-	        var circleDiam = Math.floor(this.numCols * 1.5);
-	        this.neededFrames = circleDiam * this.delayPerRing;
-	        this.circleCanvas.width = this.numCols;
-	        this.circleCanvas.height = this.numRows;
-	        this.circleCanvasCtx = this.circleCanvas.getContext('2d');
 	        var centerX = Math.floor(this.numCols/2);
 	        var centerY = Math.floor(this.numRows/2);
 
-	        var blue = 0;
-	        var green = 0;
-	        var red = 0;
+	        //Set up circle canvas
+	        this.circleCanvas = this.vmd.document.createElement('canvas');
+	        var el = this.vmd.document.getElementById('circleDebugDiv');
+	        el.appendChild(this.circleCanvas);
 
-	        this.circleCanvasCtx.fillStyle = '#FF0000';
-	        this.circleCanvasCtx.fillRect(0,0,this.numCols, this.numRows);
-
-	        for(var i = circleDiam; i >= 0; i--){
-		        blue = i;
-		        var color = '#' + MathUtils.rgbToHex(red, green, blue);
-		        this.circleCanvasCtx.beginPath();
-		        this.circleCanvasCtx.arc(centerX, centerY, i/2, 0, 2*Math.PI,false);
-		        this.circleCanvasCtx.fillStyle = color;
-		        this.circleCanvasCtx.fill();
-			}
-
-	        //Force 0 delay in center
-	        this.circleCanvasCtx.fillStyle = '#000000';
-	        this.circleCanvasCtx.fillRect(centerX-1, centerY-1,2,2);
-
-	        this.circleData = this.circleCanvasCtx.getImageData(0,0,this.circleCanvas.width, this.circleCanvas.height);
+	        this.setupCircleGradient(centerX, centerY);
 
 	        var self = this;
 	        this.geb.addHandler(VMEvent.FRAME_UPDATE, EventDispatcher.bind(self, self.handleFrameUpdate));
 	        this.geb.addHandler(WCMEvent.CONNECTED, EventDispatcher.bind(self, self.handleWebCamConnect));
 	        this.geb.addHandler(WCMEvent.STREAM_ENDED, EventDispatcher.bind(self, self.handleWebCamNotConnected));
 	        this.geb.addHandler(WCMEvent.CONNECT_FAILED, EventDispatcher.bind(self, self.handleWebCamNotConnected));
+	        this.geb.addHandler(VMEvent.GRID_CLICKED, EventDispatcher.bind(self, self.handleGridClick));
 
         }
         
         //Inherit / Extend
         ObjUtils.inheritPrototype(VideoGrid,EventDispatcher);
 
+	    VideoGrid.prototype.setupCircleGradient = function($centerX, $centerY){
+		    //Set up circle gradient
+		    //var circleDiam = Math.floor(this.numCols * 5);
+		    var circleDiam = Math.ceil(Math.sqrt((this.numCols * this.numCols)+(this.numRows * this.numRows))) * 2;
+		    this.neededFrames = circleDiam * this.delayPerRing;
+		    this.circleCanvas.width = this.numCols;
+		    this.circleCanvas.height = this.numRows;
+		    this.circleCanvasCtx = this.circleCanvas.getContext('2d');
+
+		    var blue = 0;
+		    var green = 0;
+		    var red = 0;
+
+		    this.circleCanvasCtx.fillStyle = '#0000FF';
+		    this.circleCanvasCtx.fillRect(0,0,this.numCols, this.numRows);
+
+		    for(var i = circleDiam; i >= 0; i--){
+			    blue = i;
+			    var color = '#' + MathUtils.rgbToHex(red, green, blue);
+			    this.circleCanvasCtx.beginPath();
+			    this.circleCanvasCtx.arc($centerX, $centerY, i/2, 0, 2*Math.PI,false);
+			    this.circleCanvasCtx.fillStyle = color;
+			    this.circleCanvasCtx.fill();
+		    }
+
+		    //Force 0 delay in center
+		    //this.circleCanvasCtx.fillStyle = '#000000';
+		    //this.circleCanvasCtx.fillRect($centerX-1, $centerY-1, 1, 1);
+		    this.isCircleDataDirty = true;
+	    };
+
 	    VideoGrid.prototype.handleFrameUpdate = function($e){
 
 		    if(!this.isWebCamConnected){
 			    return;
+		    }
+
+		    if(this.isCircleDataDirty){
+			    this.circleData = this.circleCanvasCtx.getImageData(0,0,this.circleCanvas.width, this.circleCanvas.height);
 		    }
 
 		    //Hack to get around the NS_COMPONENT_NOT_READY error in firefox
@@ -145,6 +156,27 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 
 			    }
 		    }
+	    };
+
+	    VideoGrid.prototype.handleGridClick = function($e){
+		    var clickX = $e.data.offsetX;
+		    var clickY = $e.data.offsetY;
+
+		    var centerX = Math.floor(((this.numCols * this.stampWidth) - clickX) / this.stampWidth);
+			if(((this.numCols * this.stampWidth) - clickX) % this.stampWidth != 0){
+				centerX += 1;
+			}
+
+		    centerX = this.numCols - centerX;
+
+		    var centerY = Math.floor(((this.numRows * this.stampHeight) - clickY) / this.stampHeight);
+		    if(((this.numRows * this.stampHeight) - clickY) % this.stampHeight != 0){
+			    centerY += 1;
+		    }
+
+		    centerY = this.numRows - centerY;
+
+		    this.setupCircleGradient(centerX, centerY);
 	    };
 
 	    VideoGrid.prototype.handleWebCamConnect = function($e){

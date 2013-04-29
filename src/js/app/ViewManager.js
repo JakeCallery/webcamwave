@@ -54,6 +54,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 				//Button Events
 				EventUtils.addDomListener(this.vmd.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
 				EventUtils.addDomListener(this.vmd.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));
+				EventUtils.addDomListener(this.vmd.finalCanvas, 'click', EventUtils.bind(self, self.handleGridClick));
 
 				//GEB Events
 				this.geb = new GEB();
@@ -68,6 +69,10 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
         
         //Inherit / Extend
         ObjUtils.inheritPrototype(ViewManager,EventDispatcher);
+
+	    ViewManager.prototype.handleGridClick = function($e){
+		    this.geb.dispatchEvent(new VMEvent(VMEvent.GRID_CLICKED, $e));
+	    };
 
 	    ViewManager.prototype.start = function(){
 	        this.update();

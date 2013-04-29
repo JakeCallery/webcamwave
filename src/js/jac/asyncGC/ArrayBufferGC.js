@@ -23,6 +23,10 @@ function(){
 			        'notsupported'
 		        );
 
+	        if(!!window.Worker !== true){
+		        throw 'Web Workers Not Supported';
+	        }
+
 	        var blob = null;
 	        try {
 		        blob = new Blob([''], {type:'application/javascript'})

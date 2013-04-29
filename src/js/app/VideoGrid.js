@@ -63,8 +63,8 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        el.appendChild(this.circleCanvas);
 	        var circleDiam = Math.floor(this.numCols * 1.5);
 	        this.neededFrames = circleDiam * this.delayPerRing;
-	        this.circleCanvas.setAttribute('width', Math.floor(this.numCols * 1.5).toString());
-	        this.circleCanvas.setAttribute('height', Math.floor(this.numRows * 1.5).toString());
+	        this.circleCanvas.width = this.numCols;
+	        this.circleCanvas.height = this.numRows;
 	        this.circleCanvasCtx = this.circleCanvas.getContext('2d');
 	        var centerX = Math.round(this.circleCanvas.width/2);
 	        var centerY = Math.round(this.circleCanvas.height/2);
@@ -73,24 +73,21 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        var green = 0;
 	        var red = 0;
 
-	        /*
-	        for(var i = this.circleCanvas.height; i >= 0; i--){
-		        blue = i*this.delayPerRing;
-		        var color = '#' + MathUtils.rgbToHex(red, green, blue);
-		        this.circleCanvasCtx.fillStyle = color;
-		        this.circleCanvasCtx.fillRect(0,i,this.circleCanvas.width, 1);
-		        //this.circleCanvasCtx.fill();
-	        }
-			*/
-	        
+	        this.circleCanvasCtx.fillStyle = '#FF0000';
+	        this.circleCanvasCtx.fillRect(0,0,this.numCols, this.numRows);
+
 	        for(var i = circleDiam; i >= 0; i--){
 		        blue = i * this.delayPerRing;
 		        var color = '#' + MathUtils.rgbToHex(red, green, blue);
 		        this.circleCanvasCtx.beginPath();
-		        this.circleCanvasCtx.arc(centerX, centerY, Math.round(i/2), 0, 2*Math.PI,false);
+		        this.circleCanvasCtx.arc(centerX, centerY, i/2, 0, 2*Math.PI,false);
 		        this.circleCanvasCtx.fillStyle = color;
 		        this.circleCanvasCtx.fill();
 			}
+
+	        //Force 0 delay in center
+	        this.circleCanvasCtx.fillStyle = '#000000';
+	        this.circleCanvasCtx.fillRect(centerX, centerY,1,1);
 
 	        this.circleData = this.circleCanvasCtx.getImageData(0,0,this.circleCanvas.width, this.circleCanvas.height);
 
@@ -143,8 +140,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 					    var idx = (r * this.circleData.width * 4) + (c * 4);
 					    var blueColor = data[idx+2];
 					    var frameIndexFromColor = parseInt(blueColor);
-					    this.finalContext.putImageData(this.pastFrames[frameIndexFromColor], c*this.stampWidth, r*this.stampHeight);
-					    //this.finalContext.putImageData(this.pastFrames[frameIndexFromColor * this.delayPerRing], c*this.stampWidth, r*this.stampHeight);
+					    this.finalContext.putImageData(this.pastFrames[this.pastFrames.length - frameIndexFromColor - 1], c*this.stampWidth, r*this.stampHeight);
 				    }
 			    }
 		    }

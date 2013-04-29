@@ -18,8 +18,6 @@ function(){
 
 	        //TODO: remove this when webwork GC hack doesn't crash Firefox
 	        this.isFireFox = /Firefox/i.test(navigator.userAgent);
-	        //this.isFireFox = (navigator.userAgent.test(/Firefox/i));
-	        console.log('Is Firefox: ' + this.isFireFox);
 	        //Set first instance
 	        AppData.prototype._singletonInstance = this;
         }

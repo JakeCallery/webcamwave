@@ -17,17 +17,15 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
          * Creates a VideoGrid object
          * @param {VMData} $vmd
          * @param {int} $numCols
-         * @param {int} $numRows
          * @extends {EventDispatcher}
          * @constructor
          */
-        function VideoGrid($vmd, $numCols, $numRows){
+        function VideoGrid($vmd, $numCols){
             //super
             EventDispatcher.call(this);
 
 	        this.arrayBufferGC = new ArrayBufferGC();
 	        this.numCols = $numCols;
-	        this.numRows = $numRows;
 	        this.vmd = $vmd;
 	        this.geb = new GEB();
 	        this.ad = new AppData();
@@ -40,10 +38,20 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 
 	        this.finalW = this.finalCanvas.width;
 	        this.finalH = this.finalCanvas.height;
-	        this.stampWidth = Math.floor(this.finalW / this.numCols);
-	        this.stampHeight = Math.floor((this.finalH / this.numRows));
+	        this.videoW = this.vmd.videoEl.width;
+	        this.videoH = this.vmd.videoEl.height;
+	        //this.stampWidth = Math.floor(this.finalW / this.numCols);
+	        //this.stampHeight = Math.floor((this.finalH / this.numRows));
 
 	        this.isWebCamConnected = false;
+
+	        //set up grid
+	        var cellWidth = Math.floor(this.finalW / this.numCols);
+	        var percent = cellWidth / this.videoW;
+	        var cellHeight = Math.floor(this.videoH * percent);
+			this.numRows = Math.floor(this.finalH / cellHeight);
+	        this.stampWidth = cellWidth;
+	        this.stampHeight = cellHeight;
 
 	        var self = this;
 	        this.geb.addHandler(VMEvent.FRAME_UPDATE, EventDispatcher.bind(self, self.handleFrameUpdate));
@@ -66,17 +74,17 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    //try/catch is super slow though, so when we are confident the component is ready, skip the try/catch
 		    if(this.contextReadyCount < 10){
 			    try{
-				    this.stampContext.drawImage(this.vmd.videoEl, 0, 0, 640, 480, 0, 0, this.stampWidth, this.stampHeight);
+				    this.stampContext.drawImage(this.vmd.videoEl, 0, 0, this.videoW, this.videoH, 0, 0, this.stampWidth, this.stampHeight);
 				    this.contextReadyCount++;
 			    } catch(err){
 				    this.contextReadyCount = 0;
 			    }
 		    } else {
-			    this.stampContext.drawImage(this.vmd.videoEl, 0, 0, 640, 480, 0, 0, this.stampWidth, this.stampHeight);
+			    this.stampContext.drawImage(this.vmd.videoEl, 0, 0, this.videoW, this.videoH, 0, 0, this.stampWidth, this.stampHeight);
 		    }
 
-
-			this.frameData = this.stampContext.getImageData(0,0,640,480);
+			//Not needed yet for this experiment, will need for future experiments
+			//this.frameData = this.stampContext.getImageData(0,0,this.stampWidth,this.stampHeight);
 
 			//make stamps
 		    for(var r = 0; r < this.numRows; r++){
@@ -87,18 +95,18 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    }
 
 		    //Hack to get around FF crashing when using Webworker ArrayBuffer dispose
+		    /*
 		    if(!this.ad.isFireFox){
 			    this.arrayBufferGC.dispose(this.frameData.data.buffer);
 		    }
+		    */
 	    };
 
 	    VideoGrid.prototype.handleWebCamConnect = function($e){
-		    console.log('Caught Cam Connect');
 		    this.isWebCamConnected = true;
 	    };
 
 	    VideoGrid.prototype.handleWebCamNotConnected = function($e){
-		    console.log('Caught Disconnect');
 		    this.isWebCamConnected = false;
 	    };
 

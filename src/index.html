@@ -42,9 +42,17 @@
     <video id="camvideo" width="640px" height="480px" class="camVideo">
     </video>
 
-    <div>
-        <button id="stopButtonEl" class="actionButton">STOP</button>
-        <button id="startButtonEl" class="actionButton">CONNECT</button>
+    <div id="buttonDiv" class="buttonGroupDiv">
+        <div id="camButtonsDiv" class="camButtonsDiv">
+            <button id="stopButtonEl" class="camButtons">STOP</button>
+            <button id="startButtonEl" class="camButtons">CONNECT</button>
+        </div>
+        <div id="patterButtonsDiv" class="patternButtonsDiv">
+            <button id="circleButtonEl" class="patternButtons circlePatternButton">.</button>
+            <button id="horizButtonEl" class="patternButtons horizPatternButton">.</button>
+            <button id="vertButtonEl" class="patternButtons vertPatternButton">.</button>
+            <button id="randomButtonEl" class="patternButtons randomPatternButton">.</button>
+        </div>
     </div>
 
     <div>

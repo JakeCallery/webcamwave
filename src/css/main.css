@@ -32,6 +32,22 @@ body {
 	margin-right: auto;
 }
 
+.buttonGroupDiv {
+	display:block;
+	width: 640px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.camButtonsDiv {
+	float: left;
+}
+
+.patternButtonsDiv {
+	display:block;
+	float: right;
+}
+
 .finalCanvas {
 	display:block;
 }
@@ -59,12 +75,13 @@ body {
 	font-size: 8pt;
 	color: #413b3d;
 	padding: 0;
-	margin: 5px 0 0 0;
+	margin-top: -1px;
+	margin-bottom: 5px;
 }
 
-.actionButton {
+.camButtons {
 	width:100px;
-	height:33px;
+	height:40px;
 	font-family: 'Open Sans', sans-serif;
 	font-weight: bold;
 	font-size: 10pt;
@@ -78,7 +95,74 @@ body {
 	border-radius: 7px;
 }
 
-.actionButton:hover {
+.camButtons:hover {
 	color: #5e8f9b;
 	background: #384c51;
 }
+
+.camButtons:disabled {
+	color: rgba(47, 68, 81, 0.40);
+	background: rgba(46, 58, 63, 0.59);
+}
+
+.camButtons:active {
+	border: solid 1px #5e8f9b;
+}
+
+.patternButtons {
+	margin: 0;
+	padding: 0;
+	width:40px;
+	height:40px;
+	background: #1A2429;
+	border: 0;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
+	font-size: 10pt;
+}
+
+.patternButtons:hover {
+	background-color: #384c51;
+}
+
+.circlePatternButton {
+	background-image: url('../img/circleButton_dark.png');
+	background-repeat: no-repeat;
+	background-position: 6px 6px;
+}
+
+.circlePatternButton:hover {
+	background-image: url('../img/circleButton.png');
+}
+
+.horizPatternButton {
+	background-image: url('../img/horizontalButton_dark.png');
+	background-repeat: no-repeat;
+	background-position: 5px 7px;
+}
+
+.horizPatternButton:hover {
+	background-image: url('../img/horizontalButton.png');
+}
+
+.vertPatternButton {
+	background-image: url('../img/verticalButton_dark.png');
+	background-repeat: no-repeat;
+	background-position: 7px 5px;
+}
+
+.vertPatternButton:hover {
+	background-image: url('../img/verticalButton.png');
+}
+
+.randomPatternButton {
+	background-image: url('../img/randomButton_dark.png');
+	background-repeat: no-repeat;
+	background-position: 7px 7px;
+}
+
+.randomPatternButton:hover {
+	background-image: url('../img/randomButton.png');
+}
+

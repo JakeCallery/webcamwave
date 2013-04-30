@@ -36,9 +36,11 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.finalCanvas = this.vmd.finalCanvas;
 	        this.finalContext = this.vmd.finalCanvasContext;
 	        this.contextReadyCount = 0;
+	        this.randomBlueMax = 60;
 	        this.stampCanvas = this.vmd.document.createElement('canvas');
 			this.stampContext = this.stampCanvas.getContext('2d');
 	        this.frameData = null;
+	        this.gradientStyle = null;
 	        this.pastFrames = [];
 
 	        this.finalW = this.finalCanvas.width;
@@ -94,7 +96,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	    };
 
 	    VideoGrid.prototype.handleHorizPattern = function($e){
-
+			this.setupHorizontalGradient(Math.floor(this.numRows/2));
 	    };
 
 	    VideoGrid.prototype.handleVertPattern = function($e){
@@ -102,18 +104,45 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	    };
 
 	    VideoGrid.prototype.handleRandomPattern = function($e){
+			this.setupRandomGradient(this.randomBlueMax);
+	    };
+
+	    VideoGrid.prototype.setupHorizontalGradient = function($baseRow){
+		    this.neededFrames = (this.numCols/2) * this.delayPerColor;
+
+		    var topRows = $baseRow - 1;
+		    var bottomRows = this.numRows - $baseRow;
+
+		    var finalBlueTop = topRows * this.delayPerColor;
+		    var finalBlueBottom = bottomRows * this.delayPerColor;
+
+		    //Clear
+		    this.gradientCtx.fillStyle = '#FF0000';
+		    this.gradientCtx.fillRect(0,0,this.numCols, this.numRows);
+
+		    //Top
+		    for(var t = 0; t < topRows; t++){
+			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueTop - t));
+			    this.gradientCtx.fillRect(0,t,this.numCols,1);
+		    }
+
+		    //Bottom
+		    for(var b = this.numRows - 1, c = 0; b >= $baseRow; b--, c++){
+			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,finalBlueBottom - c);
+			    this.gradientCtx.fillRect(0,b,this.numCols,1);
+		    }
+
+		    this.gradientStyle = 'horiz';
+		    this.isGradientDataDirty = true;
 
 	    };
 
 	    VideoGrid.prototype.setupVerticalGradient = function($baseCol){
 		    this.neededFrames = (this.numCols/2) * this.delayPerColor;
 
-		    var leftCols = $baseCol;
+		    var leftCols = $baseCol - 1;
 		    var rightCols = this.numCols - $baseCol;
 
-		    var red = 0;
-		    var green = 0;
-		    var blue = 0;
 		    var finalBlueLeft = leftCols * this.delayPerColor;
 		    var finalBlueRight = rightCols * this.delayPerColor;
 
@@ -133,10 +162,27 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 				this.gradientCtx.fillRect(r,0,1,this.numRows);
 			}
 
-		    //base col
-		    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,0);
-		    this.gradientCtx.fillRect($baseCol, 0, 1, this.numRows);
+		    this.gradientStyle = 'vert';
 
+		    this.isGradientDataDirty = true;
+
+	    };
+
+	    VideoGrid.prototype.setupRandomGradient = function($maxBlue){
+
+		    var highestBlue = 0;
+
+		    for(var r = 0; r < this.numRows; r++){
+			    for(var c = 0; c < this.numCols; c++){
+				    var blue = Math.round(Math.random() * $maxBlue);
+				    highestBlue = (blue > highestBlue)?blue:highestBlue;
+				    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,blue);
+				    this.gradientCtx.fillRect(c,r,1,1);
+			    }
+		    }
+
+		    this.neededFrames = highestBlue * this.delayPerColor;
+		    this.gradientStyle = 'random';
 		    this.isGradientDataDirty = true;
 
 	    };
@@ -165,6 +211,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    //Force 0 delay in center
 		    //this.gradientCtx.fillStyle = '#000000';
 		    //this.gradientCtx.fillRect($centerX-1, $centerY-1, 1, 1);
+		    this.gradientStyle = 'circle';
 		    this.isGradientDataDirty = true;
 	    };
 
@@ -235,7 +282,26 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    }
 
 		    centerY = this.numRows - centerY;
-		    this.setupCircleGradient(centerX, centerY);
+
+		    switch (this.gradientStyle){
+			    case 'circle':
+				    this.setupCircleGradient(centerX, centerY);
+				    break;
+
+			    case 'vert':
+				    this.setupVerticalGradient(centerX);
+				    break;
+
+			    case 'horiz':
+				    this.setupHorizontalGradient(centerY);
+				    break;
+
+			    case 'random':
+				    this.setupRandomGradient(this.randomBlueMax);
+				    break;
+
+		    }
+
 	    };
 
 	    VideoGrid.prototype.handleWebCamConnect = function($e){

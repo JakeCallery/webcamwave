@@ -11,8 +11,9 @@ define(['jac/events/EventDispatcher',
 'jac/asyncGC/ArrayBufferGC',
 'app/AppData',
 'app/events/WCMEvent',
-'jac/utils/MathUtils'],
-function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent, MathUtils){
+'jac/utils/MathUtils',
+'jac/utils/MouseUtils'],
+function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent, MathUtils, MouseUtils){
     return (function(){
         /**
          * Creates a VideoGrid object
@@ -79,6 +80,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
         ObjUtils.inheritPrototype(VideoGrid,EventDispatcher);
 
 	    VideoGrid.prototype.setupCircleGradient = function($centerX, $centerY){
+		    console.log('Setup Circle: ' + $centerX + ',' + $centerY);
 		    //Set up circle gradient
 		    //var circleDiam = Math.floor(this.numCols * 5);
 		    var circleDiam = Math.ceil(Math.sqrt((this.numCols * this.numCols)+(this.numRows * this.numRows))) * 2;
@@ -116,7 +118,9 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    }
 
 		    if(this.isCircleDataDirty){
-			    this.circleData = this.circleCanvasCtx.getImageData(0,0,this.circleCanvas.width, this.circleCanvas.height);
+			    console.log('Dirty Frame');
+			    this.circleData = this.circleCanvasCtx.getImageData(0,0,this.numCols, this.numRows);
+			    this.isCircleDataDirty = false;
 		    }
 
 		    //Hack to get around the NS_COMPONENT_NOT_READY error in firefox
@@ -153,14 +157,16 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 				    if((this.pastFrames.length - frameIndexFromColor - 1) >= 0){
 					    this.finalContext.putImageData(this.pastFrames[this.pastFrames.length - frameIndexFromColor - 1], c*this.stampWidth, r*this.stampHeight);
 				    }
-
 			    }
 		    }
 	    };
 
 	    VideoGrid.prototype.handleGridClick = function($e){
-		    var clickX = $e.data.offsetX;
-		    var clickY = $e.data.offsetY;
+		    var tmp = MouseUtils.getRelCoords(this.finalCanvas, $e.data);
+		    var clickX = tmp.x;
+		    var clickY = tmp.y;
+
+		    console.log('handle grid click: ' + clickX + ',' + clickY);
 
 		    var centerX = Math.floor(((this.numCols * this.stampWidth) - clickX) / this.stampWidth);
 			if(((this.numCols * this.stampWidth) - clickX) % this.stampWidth != 0){
@@ -175,7 +181,6 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    }
 
 		    centerY = this.numRows - centerY;
-
 		    this.setupCircleGradient(centerX, centerY);
 	    };
 

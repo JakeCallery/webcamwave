@@ -71,6 +71,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
         ObjUtils.inheritPrototype(ViewManager,EventDispatcher);
 
 	    ViewManager.prototype.handleGridClick = function($e){
+		    console.log('grid click');
 		    this.geb.dispatchEvent(new VMEvent(VMEvent.GRID_CLICKED, $e));
 	    };
 

@@ -4,28 +4,24 @@
     <meta charset='UTF-8'>
     <title>Web Cam Wave</title>
 
+    <link href='http://fonts.googleapis.com/css?family=Average+Sans|Open+Sans|Doppio+One' rel='stylesheet' type='text/css'>
+    <link href="css/main.css" rel="stylesheet"/>
+
     <script>
         var USE_COMPILED = false;
-    </script>
-
-    <script>
         var require = {
             baseUrl: '/WebCamWave/src/js',
-
             paths: {
                 modernizr: 'libs/modernizr',
                 stats: 'libs/Stats'
             },
-
             shim: {
                 modernizr: {
                     exports: 'Modernizr'
                 },
-
                 stats: {
                     exports: 'Stats'
                 }
-
             }
         };
     </script>
@@ -33,14 +29,17 @@
 </head>
 <body>
 
-    <div id='statsDiv' style="position:fixed;"></div>
-    <p>Web Cams! W00t!</p>
+    <div id="statsDiv" class="statsDiv"></div>
 
-    <canvas id="finalCanvas" width="640px" height="480px" style="display:block;">
-        No Canvas Support
-    </canvas>
+    <div class="mainWrapper">
+        <h1 class="mainHeadline">[ YOU ARE BEING WATCHED ]</h1>
 
-    <video id='camvideo' width="640px" height="480px" style="display: block;">
+        <canvas id="finalCanvas" class="finalCanvas" width="640" height="480">
+            No Canvas Support
+        </canvas>
+    </div>
+
+    <video id="camvideo" width="640px" height="480px" class="camVideo">
     </video>
 
     <div>
@@ -62,19 +61,19 @@
     <script type="text/javascript">
         //Async load RequireJS
         (function(){
-            var sel = document.createElement('script');
-            sel.type = 'text/javascript';
-            sel.async = true;
+            var sEl = document.createElement('script');
+            sEl.type = 'text/javascript';
+            sEl.async = true;
             if(USE_COMPILED === false){
-                sel.setAttribute('data-main', 'app/main');
-                sel.src = 'js/libs/require.js';
+                sEl.setAttribute('data-main', 'app/main');
+                sEl.src = 'js/libs/require.js';
             }
             else {
-                sel.src = 'js/compiled/compiled.js';
+                sEl.src = 'js/compiled/compiled.js';
             }
 
             var firstTag = document.getElementsByTagName('script')[0];
-            firstTag.parentNode.insertBefore(sel,firstTag);
+            firstTag.parentNode.insertBefore(sEl,firstTag);
         })();
     </script>
 </body>

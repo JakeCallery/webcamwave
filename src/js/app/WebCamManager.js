@@ -86,7 +86,6 @@ function(EventDispatcher,ObjUtils,GEB, EventUtils, WebCam, WebCamEvent, WCMEvent
 	     * @private
 	     */
 	    WebCamManager.prototype.handleStreamEnded = function($e){
-		    console.log('Caught STream Ended');
 			this.geb.dispatchEvent(new WCMEvent(WCMEvent.STREAM_ENDED, $e));
 	    };
 

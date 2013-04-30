@@ -5,7 +5,7 @@ html {
 }
 
 body {
-	background-color: #262022;
+	background-color: #0D0000;
 	height: 100%;
 	margin: 0;
 	padding: 0;
@@ -45,6 +45,40 @@ body {
 .mainHeadline {
 	display:block;
 	text-align: center;
+	font-size: 24pt;
 	font-family: 'Open Sans', sans-serif;
-	color: #595154;
+	color: #413b3d;
+	padding-bottom: 0;
+	margin: 0 0 10px 0;
+}
+
+.subHeadline {
+	display:block;
+	text-align: right;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 8pt;
+	color: #413b3d;
+	padding: 0;
+	margin: 5px 0 0 0;
+}
+
+.actionButton {
+	width:100px;
+	height:33px;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: bold;
+	font-size: 10pt;
+	color: #3A5661;
+	text-align: center;
+	text-decoration: none;
+	background: #1A2429;
+	border: 0;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
+}
+
+.actionButton:hover {
+	color: #5e8f9b;
+	background: #384c51;
 }

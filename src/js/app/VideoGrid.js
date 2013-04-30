@@ -36,7 +36,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.finalCanvas = this.vmd.finalCanvas;
 	        this.finalContext = this.vmd.finalCanvasContext;
 	        this.contextReadyCount = 0;
-	        this.randomBlueMax = 60;
+	        this.randomBlueMax = 200;
 	        this.stampCanvas = this.vmd.document.createElement('canvas');
 			this.stampContext = this.stampCanvas.getContext('2d');
 	        this.frameData = null;
@@ -110,7 +110,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	    VideoGrid.prototype.setupHorizontalGradient = function($baseRow){
 		    this.neededFrames = (this.numCols/2) * this.delayPerColor;
 
-		    var topRows = $baseRow - 1;
+		    var topRows = $baseRow - 0;
 		    var bottomRows = this.numRows - $baseRow;
 
 		    var finalBlueTop = topRows * this.delayPerColor;
@@ -122,13 +122,13 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 
 		    //Top
 		    for(var t = 0; t < topRows; t++){
-			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueTop - t));
+			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueTop - (t * this.delayPerColor)));
 			    this.gradientCtx.fillRect(0,t,this.numCols,1);
 		    }
 
 		    //Bottom
 		    for(var b = this.numRows - 1, c = 0; b >= $baseRow; b--, c++){
-			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,finalBlueBottom - c);
+			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueBottom - (c * this.delayPerColor)));
 			    this.gradientCtx.fillRect(0,b,this.numCols,1);
 		    }
 
@@ -140,7 +140,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	    VideoGrid.prototype.setupVerticalGradient = function($baseCol){
 		    this.neededFrames = (this.numCols/2) * this.delayPerColor;
 
-		    var leftCols = $baseCol - 1;
+		    var leftCols = $baseCol - 0;
 		    var rightCols = this.numCols - $baseCol;
 
 		    var finalBlueLeft = leftCols * this.delayPerColor;
@@ -152,13 +152,13 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 
 		    //left side
 			for(var l = 0; l < leftCols; l++){
-				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueLeft - l));
+				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueLeft - (l * this.delayPerColor)));
 				this.gradientCtx.fillRect(l,0,1,this.numRows);
 			}
 
 		    //right side
 			for(var r = this.numCols- 1, c = 0; r >= $baseCol; r--, c++){
-				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,finalBlueRight-c);
+				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,finalBlueRight - (c * this.delayPerColor));
 				this.gradientCtx.fillRect(r,0,1,this.numRows);
 			}
 

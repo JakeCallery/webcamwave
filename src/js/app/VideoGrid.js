@@ -106,7 +106,39 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	    };
 
 	    VideoGrid.prototype.setupVerticalGradient = function($baseCol){
-			
+		    this.neededFrames = (this.numCols/2) * this.delayPerColor;
+
+		    var leftCols = $baseCol;
+		    var rightCols = this.numCols - $baseCol;
+
+		    var red = 0;
+		    var green = 0;
+		    var blue = 0;
+		    var finalBlueLeft = leftCols * this.delayPerColor;
+		    var finalBlueRight = rightCols * this.delayPerColor;
+
+		    //Clear
+		    this.gradientCtx.fillStyle = '#FF0000';
+		    this.gradientCtx.fillRect(0,0,this.numCols, this.numRows);
+
+		    //left side
+			for(var l = 0; l < leftCols; l++){
+				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueLeft - l));
+				this.gradientCtx.fillRect(l,0,1,this.numRows);
+			}
+
+		    //right side
+			for(var r = this.numCols- 1, c = 0; r >= $baseCol; r--, c++){
+				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,finalBlueRight-c);
+				this.gradientCtx.fillRect(r,0,1,this.numRows);
+			}
+
+		    //base col
+		    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,0);
+		    this.gradientCtx.fillRect($baseCol, 0, 1, this.numRows);
+
+		    this.isGradientDataDirty = true;
+
 	    };
 
 	    VideoGrid.prototype.setupCircleGradient = function($centerX, $centerY){
@@ -133,7 +165,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    //Force 0 delay in center
 		    //this.gradientCtx.fillStyle = '#000000';
 		    //this.gradientCtx.fillRect($centerX-1, $centerY-1, 1, 1);
-		    this.isCircleDataDirty = true;
+		    this.isGradientDataDirty = true;
 	    };
 
 	    VideoGrid.prototype.handleFrameUpdate = function($e){
@@ -142,9 +174,9 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			    return;
 		    }
 
-		    if(this.isCircleDataDirty){
+		    if(this.isGradientDataDirty){
 			    this.circleData = this.gradientCtx.getImageData(0,0,this.numCols, this.numRows);
-			    this.isCircleDataDirty = false;
+			    this.isGradientDataDirty = false;
 		    }
 
 		    //Hack to get around the NS_COMPONENT_NOT_READY error in firefox

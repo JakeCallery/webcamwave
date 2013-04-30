@@ -25,6 +25,10 @@ function(JacEvent,ObjUtils){
 	    /** @const */ VMEvent.REQUEST_CAM_START = 'vmRequestCamStartEvent';
 	    /** @const */ VMEvent.FRAME_UPDATE = 'vmFrameUpdateEvent';
 	    /** @const */ VMEvent.GRID_CLICKED = 'vmGridClickedEvent';
+		/** @const */ VMEvent.REQUEST_CIRCLE_PATTERN = 'vmRequestCirclePatternEvent';
+		/** @const */ VMEvent.REQUEST_HORIZ_PATTERN = 'vmRequestHorizPatternEvent';
+		/** @const */ VMEvent.REQUEST_VERT_PATTERN = 'vmRequestVertPatternEvent';
+		/** @const */ VMEvent.REQUEST_RANDOM_PATTERN = 'vmRequestRandomPatternEvent';
 
         //Return constructor
         return VMEvent;

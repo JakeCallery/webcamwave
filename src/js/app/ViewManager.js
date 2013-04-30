@@ -34,10 +34,16 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 	        this.vmd.videoEl = $document.getElementById('camvideo');
 	        this.vmd.finalCanvas = $document.getElementById('finalCanvas');
 	        this.vmd.finalCanvasContext = null;
+
 	        this.vmd.startButtonEl = $document.getElementById('startButtonEl');
 	        this.vmd.stopButtonEl = $document.getElementById('stopButtonEl');
 	        this.vmd.startButtonEl.disabled = false;
 	        this.vmd.stopButtonEl.disabled = true;
+	        this.vmd.circleButtonEl = $document.getElementById('circleButtonEl');
+	        this.vmd.horizButtonEl = $document.getElementById('horizButtonEl');
+	        this.vmd.vertButtonEl = $document.getElementById('vertButtonEl');
+	        this.vmd.randomButtonEl = $document.getElementById('randomButtonEl');
+
 	        this.vmd.stats = null;
 			this.updateDelegate = EventUtils.bind(self, self.update);
 	        this.frameUpdateEvent = new VMEvent(VMEvent.FRAME_UPDATE);
@@ -55,6 +61,10 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 				EventUtils.addDomListener(this.vmd.startButtonEl, 'click', EventUtils.bind(self, self.handleStartClick));
 				EventUtils.addDomListener(this.vmd.stopButtonEl, 'click', EventUtils.bind(self, self.handleStopClick));
 				EventUtils.addDomListener(this.vmd.finalCanvas, 'click', EventUtils.bind(self, self.handleGridClick));
+				EventUtils.addDomListener(this.vmd.circleButtonEl, 'click', EventUtils.bind(self, self.handleCircleClick));
+				EventUtils.addDomListener(this.vmd.horizButtonEl, 'click', EventUtils.bind(self, self.handleHorizClick));
+				EventUtils.addDomListener(this.vmd.vertButtonEl, 'click', EventUtils.bind(self, self.handleVertClick));
+				EventUtils.addDomListener(this.vmd.randomButtonEl, 'click', EventUtils.bind(self, self.handleRandomClick));
 
 				//GEB Events
 				this.geb = new GEB();
@@ -72,6 +82,22 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 
 	    ViewManager.prototype.handleGridClick = function($e){
 		    this.geb.dispatchEvent(new VMEvent(VMEvent.GRID_CLICKED, $e));
+	    };
+
+	    ViewManager.prototype.handleCircleClick = function($e){
+		    this.geb.dispatchEvent(new VMEvent(VMEvent.REQUEST_CIRCLE_PATTERN, $e));
+	    };
+
+	    ViewManager.prototype.handleHorizClick = function($e){
+		    this.geb.dispatchEvent(new VMEvent(VMEvent.REQUEST_HORIZ_PATTERN, $e));
+	    };
+
+	    ViewManager.prototype.handleVertClick = function($e){
+		    this.geb.dispatchEvent(new VMEvent(VMEvent.REQUEST_VERT_PATTERN, $e));
+	    };
+
+	    ViewManager.prototype.handleRandomClick = function($e){
+		    this.geb.dispatchEvent(new VMEvent(VMEvent.REQUEST_RANDOM_PATTERN, $e));
 	    };
 
 	    ViewManager.prototype.start = function(){

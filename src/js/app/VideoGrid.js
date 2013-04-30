@@ -19,18 +19,18 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
          * Creates a VideoGrid object
          * @param {VMData} $vmd
          * @param {int} $numCols
-         * @param {int} $delayPerRing
+         * @param {int} $delayPerColor
          * @extends {EventDispatcher}
          * @constructor
          */
-        function VideoGrid($vmd, $numCols, $delayPerRing){
+        function VideoGrid($vmd, $numCols, $delayPerColor){
             //super
             EventDispatcher.call(this);
 
 	        this.arrayBufferGC = new ArrayBufferGC();
 	        this.numCols = $numCols;
 	        this.vmd = $vmd;
-	        this.delayPerRing = $delayPerRing;
+	        this.delayPerColor = $delayPerColor;
 	        this.geb = new GEB();
 	        this.ad = new AppData();
 	        this.finalCanvas = this.vmd.finalCanvas;
@@ -45,8 +45,6 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.finalH = this.finalCanvas.height;
 	        this.videoW = this.vmd.videoEl.width;
 	        this.videoH = this.vmd.videoEl.height;
-	        //this.stampWidth = Math.floor(this.finalW / this.numCols);
-	        //this.stampHeight = Math.floor((this.finalH / this.numRows));
 
 	        this.isWebCamConnected = false;
 
@@ -57,14 +55,20 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			this.numRows = Math.floor(this.finalH / cellHeight);
 	        this.stampWidth = cellWidth;
 	        this.stampHeight = cellHeight;
+
+	        //Set up gradient canvas
+	        this.gradientCanvas = this.vmd.document.createElement('canvas');
+	        this.gradientCanvas.width = this.numCols;
+	        this.gradientCanvas.height = this.numRows;
+	        this.gradientCtx = this.gradientCanvas.getContext('2d');
+
+	        //Debug gradient canvas
+	        var el = this.vmd.document.getElementById('circleDebugDiv');
+	        el.appendChild(this.gradientCanvas);
+
+	        //set up default pattern
 	        var centerX = Math.floor(this.numCols/2);
 	        var centerY = Math.floor(this.numRows/2);
-
-	        //Set up circle canvas
-	        this.circleCanvas = this.vmd.document.createElement('canvas');
-	        var el = this.vmd.document.getElementById('circleDebugDiv');
-	        el.appendChild(this.circleCanvas);
-
 	        this.setupCircleGradient(centerX, centerY);
 
 	        var self = this;
@@ -73,39 +77,62 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.geb.addHandler(WCMEvent.STREAM_ENDED, EventDispatcher.bind(self, self.handleWebCamNotConnected));
 	        this.geb.addHandler(WCMEvent.CONNECT_FAILED, EventDispatcher.bind(self, self.handleWebCamNotConnected));
 	        this.geb.addHandler(VMEvent.GRID_CLICKED, EventDispatcher.bind(self, self.handleGridClick));
+	        this.geb.addHandler(VMEvent.REQUEST_CIRCLE_PATTERN, EventDispatcher.bind(self, self.handleCirclePattern));
+	        this.geb.addHandler(VMEvent.REQUEST_HORIZ_PATTERN, EventDispatcher.bind(self, self.handleHorizPattern));
+	        this.geb.addHandler(VMEvent.REQUEST_VERT_PATTERN, EventDispatcher.bind(self, self.handleVertPattern));
+	        this.geb.addHandler(VMEvent.REQUEST_RANDOM_PATTERN, EventDispatcher.bind(self, self.handleRandomPattern));
 
         }
         
         //Inherit / Extend
         ObjUtils.inheritPrototype(VideoGrid,EventDispatcher);
 
+	    VideoGrid.prototype.handleCirclePattern = function($e){
+		    var centerX = Math.floor(this.numCols/2);
+		    var centerY = Math.floor(this.numRows/2);
+		    this.setupCircleGradient(centerX, centerY);
+	    };
+
+	    VideoGrid.prototype.handleHorizPattern = function($e){
+
+	    };
+
+	    VideoGrid.prototype.handleVertPattern = function($e){
+			this.setupVerticalGradient(Math.floor(this.numCols/2));
+	    };
+
+	    VideoGrid.prototype.handleRandomPattern = function($e){
+
+	    };
+
+	    VideoGrid.prototype.setupVerticalGradient = function($baseCol){
+			
+	    };
+
 	    VideoGrid.prototype.setupCircleGradient = function($centerX, $centerY){
 		    //Set up circle gradient
 		    var circleDiam = Math.ceil(Math.sqrt((this.numCols * this.numCols)+(this.numRows * this.numRows))) * 2;
-		    this.neededFrames = circleDiam * this.delayPerRing;
-		    this.circleCanvas.width = this.numCols;
-		    this.circleCanvas.height = this.numRows;
-		    this.circleCanvasCtx = this.circleCanvas.getContext('2d');
+		    this.neededFrames = circleDiam * this.delayPerColor;
 
 		    var blue = 0;
 		    var green = 0;
 		    var red = 0;
 
-		    this.circleCanvasCtx.fillStyle = '#0000FF';
-		    this.circleCanvasCtx.fillRect(0,0,this.numCols, this.numRows);
+		    this.gradientCtx.fillStyle = '#0000FF';
+		    this.gradientCtx.fillRect(0,0,this.numCols, this.numRows);
 
 		    for(var i = circleDiam; i >= 0; i--){
 			    blue = i;
 			    var color = '#' + MathUtils.rgbToHex(red, green, blue);
-			    this.circleCanvasCtx.beginPath();
-			    this.circleCanvasCtx.arc($centerX, $centerY, i/2, 0, 2*Math.PI,false);
-			    this.circleCanvasCtx.fillStyle = color;
-			    this.circleCanvasCtx.fill();
+			    this.gradientCtx.beginPath();
+			    this.gradientCtx.arc($centerX, $centerY, i/2, 0, 2*Math.PI,false);
+			    this.gradientCtx.fillStyle = color;
+			    this.gradientCtx.fill();
 		    }
 
 		    //Force 0 delay in center
-		    //this.circleCanvasCtx.fillStyle = '#000000';
-		    //this.circleCanvasCtx.fillRect($centerX-1, $centerY-1, 1, 1);
+		    //this.gradientCtx.fillStyle = '#000000';
+		    //this.gradientCtx.fillRect($centerX-1, $centerY-1, 1, 1);
 		    this.isCircleDataDirty = true;
 	    };
 
@@ -116,7 +143,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    }
 
 		    if(this.isCircleDataDirty){
-			    this.circleData = this.circleCanvasCtx.getImageData(0,0,this.numCols, this.numRows);
+			    this.circleData = this.gradientCtx.getImageData(0,0,this.numCols, this.numRows);
 			    this.isCircleDataDirty = false;
 		    }
 
@@ -150,7 +177,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			    for(var c = 0; c < this.numCols; c++){
 				    var idx = (r * this.circleData.width * 4) + (c * 4);
 				    var blueColor = data[idx+2];
-				    var frameIndexFromColor = parseInt(blueColor) * this.delayPerRing;
+				    var frameIndexFromColor = parseInt(blueColor) * this.delayPerColor;
 				    if((this.pastFrames.length - frameIndexFromColor - 1) >= 0){
 					    this.finalContext.putImageData(this.pastFrames[this.pastFrames.length - frameIndexFromColor - 1], c*this.stampWidth, r*this.stampHeight);
 				    }

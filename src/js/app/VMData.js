@@ -19,6 +19,10 @@ function(){
 	        this.finalCanvasContext = null;
 	        this.startButtonEl = null;
 	        this.stopButtonEl = null;
+	        this.circleButtonEl = null;
+	        this.horizButtonEl = null;
+	        this.vertButtonEl = null;
+	        this.randomButtonEl = null;
 	        this.stats = null;
         }
 

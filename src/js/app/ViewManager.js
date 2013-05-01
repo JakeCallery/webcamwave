@@ -19,10 +19,11 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData, D
          * @param {Document} $document
          * @param {Window} $window
          * @param {navigator} $navigator
+         * @param {object} $config
          * @extends {EventDispatcher}
          * @constructor
          */
-        function ViewManager($document, $window, $navigator){
+        function ViewManager($document, $window, $navigator, $config){
             //super
             EventDispatcher.call(this);
 
@@ -57,7 +58,9 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData, D
 				//Set up stats
 				this.vmd.stats = new Stats();
 				this.vmd.stats.setMode(0);
-				this.vmd.document.getElementById('statsDiv').appendChild(this.vmd.stats.domElement);
+				if($config.fps == 1){
+					this.vmd.document.getElementById('statsDiv').appendChild(this.vmd.stats.domElement);
+				}
 
 				this.vmd.finalCanvasContext = this.vmd.finalCanvas.getContext('2d');
 

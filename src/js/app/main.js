@@ -15,13 +15,11 @@ require([
 'app/VideoGrid',
 'jac/utils/BrowserUtils'],
 function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager, RequestAnimationFrame, VideoGrid, BrowserUtils){
-	var geb = new GlobalEventBus();
-	var vm = new ViewManager(doc, window, navigator);
-	var wcm = new WebCamManager(vm.vmd);
 
 	var config = {};
 	config.cols = 20;
 	config.delay = 2;
+	config.fps = 0;
 
 	var params = BrowserUtils.getURLParams(window);
 
@@ -31,6 +29,9 @@ function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager, RequestAnimatio
 		}
 	}
 
+	var geb = new GlobalEventBus();
+	var vm = new ViewManager(doc, window, navigator, config);
+	var wcm = new WebCamManager(vm.vmd);
 	var videoGrid = new VideoGrid(vm.vmd, parseInt(config.cols), parseInt(config.delay));
 	wcm.init();
 	vm.start();

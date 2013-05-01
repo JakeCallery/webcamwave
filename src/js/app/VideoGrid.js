@@ -246,11 +246,13 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			    this.stampContext.drawImage(this.vmd.videoEl, 0, 0, this.videoW, this.videoH, 0, 0, this.stampWidth, this.stampHeight);
 		    }
 
-		    //generate avg color
-		    this.setGlowColor(0,0,254);
-
 			//Not needed yet for this experiment, will need for future experiments
-			this.pastFrames.push(this.stampContext.getImageData(0,0,this.stampWidth,this.stampHeight));
+		    var frameData = this.stampContext.getImageData(0,0,this.stampWidth,this.stampHeight);
+			this.pastFrames.push(frameData);
+
+		    //generate avg color
+		    var avgRGB = this.getAvgRGB(frameData.data);
+		    this.setGlowColor(avgRGB.r, avgRGB.g, avgRGB.b);
 
 		    if(this.pastFrames.length > this.neededFrames){
 			    var oldFrame = this.pastFrames.shift();
@@ -272,6 +274,24 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 				    }
 			    }
 		    }
+	    };
+
+	    VideoGrid.prototype.getAvgRGB = function($imgData){
+			var length = $imgData.length;
+
+		    var rgb = {r:0,g:0,b:0};
+
+		    for(var i = 0, count = 0; i < length; (i=((i+4)*4)), count++){
+				rgb.r += $imgData[i];
+				rgb.g += $imgData[i+1];
+				rgb.b += $imgData[i+2];
+		    }
+
+		    rgb.r = Math.floor(rgb.r/count);
+		    rgb.g = Math.floor(rgb.g/count);
+		    rgb.b = Math.floor(rgb.b/count);
+
+		    return rgb;
 	    };
 
 	    VideoGrid.prototype.handleGridClick = function($e){

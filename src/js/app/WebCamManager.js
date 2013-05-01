@@ -76,7 +76,7 @@ function(EventDispatcher,ObjUtils,GEB, EventUtils, WebCam, WebCamEvent, WCMEvent
 	     */
 	    WebCamManager.prototype.handleReqCamStart = function($e){
 			if(this.webCam){
-				this.webCam.init(true, true);
+				this.webCam.init(true, false);
 			}
 	    };
 

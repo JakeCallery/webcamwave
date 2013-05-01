@@ -13,8 +13,9 @@ define(['jac/events/EventDispatcher',
 'app/events/WCMEvent',
 'jac/utils/MathUtils',
 'jac/utils/MouseUtils',
-'jac/utils/BrowserUtils'],
-function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent, MathUtils, MouseUtils, BrowserUtils){
+'jac/utils/BrowserUtils',
+'jac/utils/DOMUtils'],
+function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent, MathUtils, MouseUtils, BrowserUtils, DOMUtils){
     return (function(){
         /**
          * Creates a VideoGrid object
@@ -84,16 +85,21 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.geb.addHandler(VMEvent.REQUEST_HORIZ_PATTERN, EventDispatcher.bind(self, self.handleHorizPattern));
 	        this.geb.addHandler(VMEvent.REQUEST_VERT_PATTERN, EventDispatcher.bind(self, self.handleVertPattern));
 	        this.geb.addHandler(VMEvent.REQUEST_RANDOM_PATTERN, EventDispatcher.bind(self, self.handleRandomPattern));
-
+			this.geb.addHandler(VMEvent.GLOW_UPDATE, EventDispatcher.bind(self, self.handleGlowUpdate));
         }
         
         //Inherit / Extend
         ObjUtils.inheritPrototype(VideoGrid,EventDispatcher);
 
+	    VideoGrid.prototype.handleGlowUpdate = function($e){
+	    };
+
 	    VideoGrid.prototype.setGlowColor = function($red, $green, $blue){
-		    var boxShadowProp = BrowserUtils.getSupportedProp(['boxShadow', 'MozBoxShadow', 'WebkitBoxShadow']);
-		    var color = '#' + MathUtils.rgbToHex($red, $green, $blue);
-		    this.finalCanvas.style[boxShadowProp] = '0 0 30px 3px ' + color;
+		    var boxShadowProp = DOMUtils.getSupportedProp(['boxShadow', 'MozBoxShadow', 'WebkitBoxShadow']);
+		    if(boxShadowProp != ''){
+			    var color = '#' + MathUtils.rgbToHex($red, $green, $blue);
+			    this.finalCanvas.style[boxShadowProp] = '0 0 30px 3px ' + color;
+		    }
 	    };
 
 	    VideoGrid.prototype.handleCirclePattern = function($e){
@@ -251,8 +257,11 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			this.pastFrames.push(frameData);
 
 		    //generate avg color
-		    var avgRGB = this.getAvgRGB(frameData.data);
-		    this.setGlowColor(avgRGB.r, avgRGB.g, avgRGB.b);
+		    if(this.vmd.isGlowing === true){
+			    var avgRGB = this.getAvgRGB(frameData.data);
+			    this.setGlowColor(avgRGB.r, avgRGB.g, avgRGB.b);
+		    }
+
 
 		    if(this.pastFrames.length > this.neededFrames){
 			    var oldFrame = this.pastFrames.shift();

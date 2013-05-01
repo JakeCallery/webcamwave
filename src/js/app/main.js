@@ -12,12 +12,26 @@ require([
 'app/ViewManager',
 'app/WebCamManager',
 'jac/polyfills/RequestAnimationFrame',
-'app/VideoGrid'],
-function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager, RequestAnimationFrame, VideoGrid){
+'app/VideoGrid',
+'jac/utils/BrowserUtils'],
+function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager, RequestAnimationFrame, VideoGrid, BrowserUtils){
 	var geb = new GlobalEventBus();
 	var vm = new ViewManager(doc, window, navigator);
 	var wcm = new WebCamManager(vm.vmd);
-	var videoGrid = new VideoGrid(vm.vmd, 20, 2);
+
+	var config = {};
+	config.cols = 20;
+	config.delay = 2;
+
+	var params = BrowserUtils.getURLParams(window);
+
+	for(var prop in params){
+		if(params.hasOwnProperty(prop)){
+			config[prop] = params[prop];
+		}
+	}
+
+	var videoGrid = new VideoGrid(vm.vmd, config.cols, config.delay);
 	wcm.init();
 	vm.start();
 });

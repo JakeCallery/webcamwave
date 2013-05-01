@@ -10,8 +10,9 @@ define([
 'app/events/WCMEvent',
 'jac/utils/EventUtils',
 'app/events/VMEvent',
-'app/VMData'],
-function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
+'app/VMData',
+'jac/utils/DOMUtils'],
+function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData, DOMUtils){
     return (function(){
         /**
          * Creates a ViewManager object
@@ -43,10 +44,13 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 	        this.vmd.horizButtonEl = $document.getElementById('horizButtonEl');
 	        this.vmd.vertButtonEl = $document.getElementById('vertButtonEl');
 	        this.vmd.randomButtonEl = $document.getElementById('randomButtonEl');
+	        this.vmd.glowButtonEl = $document.getElementById('glowButtonEl');
 
 	        this.vmd.stats = null;
 			this.updateDelegate = EventUtils.bind(self, self.update);
 	        this.frameUpdateEvent = new VMEvent(VMEvent.FRAME_UPDATE);
+
+	        this.vmd.isGlowing = false;
 
 	        //check for canvas support
 			if(!!window.CanvasRenderingContext2D){
@@ -65,6 +69,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 				EventUtils.addDomListener(this.vmd.horizButtonEl, 'click', EventUtils.bind(self, self.handleHorizClick));
 				EventUtils.addDomListener(this.vmd.vertButtonEl, 'click', EventUtils.bind(self, self.handleVertClick));
 				EventUtils.addDomListener(this.vmd.randomButtonEl, 'click', EventUtils.bind(self, self.handleRandomClick));
+				EventUtils.addDomListener(this.vmd.glowButtonEl, 'click', EventUtils.bind(self, self.handleGlowButtonClick));
 
 				//GEB Events
 				this.geb = new GEB();
@@ -79,6 +84,16 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
         
         //Inherit / Extend
         ObjUtils.inheritPrototype(ViewManager,EventDispatcher);
+
+	    ViewManager.prototype.handleGlowButtonClick = function($e){
+		    this.vmd.isGlowing = !this.vmd.isGlowing;
+		    this.geb.dispatchEvent(new VMEvent(VMEvent.GLOW_UPDATE, this.vmd.isGlowing));
+
+		    if(this.vmd.isGlowing !== true){
+			    var boxShadowProp = DOMUtils.getSupportedProp(['boxShadow', 'MozBoxShadow', 'WebkitBoxShadow']);
+			    this.vmd.finalCanvas.style[boxShadowProp] = 'none';
+		    }
+	    };
 
 	    ViewManager.prototype.handleGridClick = function($e){
 		    this.geb.dispatchEvent(new VMEvent(VMEvent.GRID_CLICKED, $e));
@@ -160,8 +175,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 	    ViewManager.prototype.handleConnectFail = function($e){
 			this.vmd.stopButtonEl.disabled = true;
 			this.vmd.startButtonEl.disabled = false;
-
-		    this.showError('Please Allow Access To WebCam, press start');
+		   //this.showError('Please Allow Access To WebCam, press start');
 	    };
 
 	    /**
@@ -172,7 +186,7 @@ function(EventDispatcher,ObjUtils, GEB, WCMEvent, EventUtils, VMEvent, VMData){
 	    ViewManager.prototype.handleStreamEnded = function($e){
 		    this.vmd.stopButtonEl.disabled = true;
 		    this.vmd.startButtonEl.disabled = false;
-		    this.showError('Camera Disconnected');
+		   // this.showError('Camera Disconnected');
 	    };
 
         //Return constructor

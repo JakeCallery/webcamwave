@@ -12,8 +12,9 @@ define(['jac/events/EventDispatcher',
 'app/AppData',
 'app/events/WCMEvent',
 'jac/utils/MathUtils',
-'jac/utils/MouseUtils'],
-function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent, MathUtils, MouseUtils){
+'jac/utils/MouseUtils',
+'jac/utils/BrowserUtils'],
+function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData, WCMEvent, MathUtils, MouseUtils, BrowserUtils){
     return (function(){
         /**
          * Creates a VideoGrid object
@@ -88,6 +89,12 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
         
         //Inherit / Extend
         ObjUtils.inheritPrototype(VideoGrid,EventDispatcher);
+
+	    VideoGrid.prototype.setGlowColor = function($red, $green, $blue){
+		    var boxShadowProp = BrowserUtils.getSupportedProp(['boxShadow', 'MozBoxShadow', 'WebkitBoxShadow']);
+		    var color = '#' + MathUtils.rgbToHex($red, $green, $blue);
+		    this.finalCanvas.style[boxShadowProp] = '0 0 30px 3px ' + color;
+	    };
 
 	    VideoGrid.prototype.handleCirclePattern = function($e){
 		    var centerX = Math.floor(this.numCols/2);
@@ -238,6 +245,9 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 		    } else {
 			    this.stampContext.drawImage(this.vmd.videoEl, 0, 0, this.videoW, this.videoH, 0, 0, this.stampWidth, this.stampHeight);
 		    }
+
+		    //generate avg color
+		    this.setGlowColor(0,0,254);
 
 			//Not needed yet for this experiment, will need for future experiments
 			this.pastFrames.push(this.stampContext.getImageData(0,0,this.stampWidth,this.stampHeight));

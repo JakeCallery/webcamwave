@@ -67,8 +67,8 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	        this.gradientCtx = this.gradientCanvas.getContext('2d');
 
 	        //Debug gradient canvas
-	        var el = this.vmd.document.getElementById('circleDebugDiv');
-	        el.appendChild(this.gradientCanvas);
+	        //var el = this.vmd.document.getElementById('circleDebugDiv');
+	        //el.appendChild(this.gradientCanvas);
 
 	        //set up default pattern
 	        var centerX = Math.floor(this.numCols/2);

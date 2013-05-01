@@ -121,13 +121,10 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	    };
 
 	    VideoGrid.prototype.setupHorizontalGradient = function($baseRow){
-		    this.neededFrames = (this.numCols/2) * this.delayPerColor;
+		    this.neededFrames = this.numRows * this.delayPerColor;
 
 		    var topRows = $baseRow - 0;
 		    var bottomRows = this.numRows - $baseRow;
-
-		    var finalBlueTop = topRows * this.delayPerColor;
-		    var finalBlueBottom = bottomRows * this.delayPerColor;
 
 		    //Clear
 		    this.gradientCtx.fillStyle = '#FF0000';
@@ -135,13 +132,13 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 
 		    //Top
 		    for(var t = 0; t < topRows; t++){
-			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueTop - (t * this.delayPerColor)));
+			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(topRows - t));
 			    this.gradientCtx.fillRect(0,t,this.numCols,1);
 		    }
 
 		    //Bottom
 		    for(var b = this.numRows - 1, c = 0; b >= $baseRow; b--, c++){
-			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueBottom - (c * this.delayPerColor)));
+			    this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(bottomRows - c));
 			    this.gradientCtx.fillRect(0,b,this.numCols,1);
 		    }
 
@@ -151,7 +148,7 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 	    };
 
 	    VideoGrid.prototype.setupVerticalGradient = function($baseCol){
-		    this.neededFrames = (this.numCols/2) * this.delayPerColor;
+		    this.neededFrames = this.numCols * this.delayPerColor;
 
 		    var leftCols = $baseCol - 0;
 		    var rightCols = this.numCols - $baseCol;
@@ -165,13 +162,13 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 
 		    //left side
 			for(var l = 0; l < leftCols; l++){
-				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(finalBlueLeft - (l * this.delayPerColor)));
+				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(leftCols - l));
 				this.gradientCtx.fillRect(l,0,1,this.numRows);
 			}
 
 		    //right side
 			for(var r = this.numCols- 1, c = 0; r >= $baseCol; r--, c++){
-				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,finalBlueRight - (c * this.delayPerColor));
+				this.gradientCtx.fillStyle = '#' + MathUtils.rgbToHex(0,0,(rightCols - c));
 				this.gradientCtx.fillRect(r,0,1,this.numRows);
 			}
 
@@ -262,13 +259,15 @@ function(EventDispatcher,ObjUtils, GEB, VMEvent, VMData, ArrayBufferGC, AppData,
 			    this.setGlowColor(avgRGB.r, avgRGB.g, avgRGB.b);
 		    }
 
-
 		    if(this.pastFrames.length > this.neededFrames){
-			    var oldFrame = this.pastFrames.shift();
-			    if(!this.ad.isFireFox){
-				    this.arrayBufferGC.dispose(oldFrame);
+			    var diff = this.pastFrames.length - this.neededFrames;
+			    for(var f = 0; f < diff; f++){
+				    var oldFrame = this.pastFrames.shift();
+				    if(!this.ad.isFireFox){
+					    this.arrayBufferGC.dispose(oldFrame);
+				    }
+				    oldFrame = null;
 			    }
-			    oldFrame = null;
 		    }
 
 			//make stamps

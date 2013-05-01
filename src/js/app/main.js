@@ -31,7 +31,7 @@ function(doc, Stats, GlobalEventBus, ViewManager, WebCamManager, RequestAnimatio
 		}
 	}
 
-	var videoGrid = new VideoGrid(vm.vmd, config.cols, config.delay);
+	var videoGrid = new VideoGrid(vm.vmd, parseInt(config.cols), parseInt(config.delay));
 	wcm.init();
 	vm.start();
 });
